@@ -33,7 +33,7 @@
     <textarea style="width:100%;height:400px;" name="body"></textarea>
 
     <p>宛先<br>
-        メアド,名前{改行}<br>
+    名前\tメアド{改行}<br>
         <br>
         名前は、本文に{{name}}と書く事で置換できます。
     </p>
