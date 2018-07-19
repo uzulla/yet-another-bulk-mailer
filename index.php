@@ -33,9 +33,15 @@
     <textarea style="width:100%;height:400px;" name="body"></textarea>
 
     <p>宛先<br>
-    名前\tメアド{改行}<br>
+    例：名前\tメアド{改行}<br>
+    
+    ※ \tはタブです。<br>
+    ※ メアドはカンマつなぎで複数指定できます、２つ目以降はCCに入ります。<br>
+    ※ サンプル
+    <pre style="background-color:#CCCCCC;width:400px;">たなかたろう	taro@example.com
+山田次郎	jiro@example.com,jiro_s_boss@example.com</pre>
         <br>
-        名前は、本文に{{name}}と書く事で置換できます。
+    ※ 名前は、本文に{{name}}と書く事で置換できます。
     </p>
     <textarea style="width:100%;height:400px;" name="mail_list"></textarea>
 

@@ -11,20 +11,34 @@ ini_set('display_errors', 1);
 echo "<pre>";
 require_once("vendor/autoload.php");
 
-$gmail_id = $_POST['gmail_id'];
-$gmail_pass = $_POST['gmail_pass'];
+$mail_list_raw = explode("\n", $_POST['mail_list']);
 
-$transport = (new Swift_SmtpTransport('smtp.gmail.com', 465, 'ssl'))
-    ->setUsername($gmail_id)
-    ->setPassword($gmail_pass);
+$mail_list = [];
+foreach ($mail_list_raw as $email) {
+    $email=trim($email);
+    if (!preg_match("/@/", $email)) continue;
+    
+    $result = preg_match("|\A(.*)\t(.*)\z|u", $email, $m);
+    if(!$result){
+        echo "<span style='color:red'>宛先のフォーマットが不正です。（「本当に」タブでくぎっていますか？）</span>\n";
+        var_dump($email);
+        exit;
+    }
 
-$mailer = new Swift_Mailer($transport);
+    $mail_list[] = [
+        'name'=>$m[1],
+        'email'=>$m[2]
+    ];
+}
 
-$subject = $_POST['subject'];
-echo htmlspecialchars("\n件名:\n{$subject}", ENT_QUOTES);
+echo "<h3>送信先メアド</h3>";
 
-$template_body = $_POST['body'];
-echo htmlspecialchars("\n本文:\n{$template_body}", ENT_QUOTES);
+echo htmlspecialchars(print_r($mail_list,1), ENT_QUOTES);
+echo "<hr>";
+echo "<h3>送信テンプレート</h3>";
+
+$is_no_dry_run = (isset($_POST['no_dry_run']) && $_POST['no_dry_run'] == 1) ? true : false;
+
 
 $from_name = $_POST['from_name'];
 echo htmlspecialchars("\nFROM 名前:\n{$from_name}", ENT_QUOTES);
@@ -34,60 +48,81 @@ echo htmlspecialchars("\nFROM email:\n{$from_email}", ENT_QUOTES);
 
 $cc_email = $_POST['cc'];
 echo htmlspecialchars("\nCC:\n{$cc_email}", ENT_QUOTES);
-$orig_cc_list = [$cc_email];
+$orig_cc_list = explode(',', $cc_email);
 
-$is_no_dry_run = (isset($_POST['no_dry_run']) && $_POST['no_dry_run'] == 1) ? true : false;
+$subject = $_POST['subject'];
+echo htmlspecialchars("\n件名:\n{$subject}", ENT_QUOTES);
 
-$mail_list_raw = explode("\n", $_POST['mail_list']);
+$template_body = $_POST['body'];
+echo "\n本文:<br><pre style='background-color:#eeeeee'>";
+echo htmlspecialchars("{$template_body}", ENT_QUOTES);
+echo "</pre>\n";
 
-$mail_list = [];
-foreach ($mail_list_raw as $email) {
-    if (!preg_match("/@/", $email)) continue;
-    $mail_list[] = trim($email);
-}
-
-echo htmlspecialchars("\n to addresses :\n", ENT_QUOTES);
-echo htmlspecialchars(print_r($mail_list,1), ENT_QUOTES);
 echo "<hr>";
+
+// swiftmailer 用意
+$gmail_id = $_POST['gmail_id'];
+$gmail_pass = $_POST['gmail_pass'];
+
+$transport = (new Swift_SmtpTransport('smtp.gmail.com', 465, 'ssl'))
+    ->setUsername($gmail_id)
+    ->setPassword($gmail_pass);
+
+$mailer = new Swift_Mailer($transport);
 
 $message = new Swift_Message($subject);
 $message
     ->setFrom([$from_email => $from_name]);
 
-foreach ($mail_list as $line) {
-    $cc_list = $orig_cc_list;
+// 逐次送信
+foreach ($mail_list as $mail) {
+    echo "<h3>送信メール</h3>";
 
-    preg_match("|(?P<name>.*)\t(?P<email>.*)|u", $line, $m);
-    list($to, $name) = [$m['email'], $m['name']];
-    echo htmlspecialchars("{$to}<{$name}>\n", ENT_QUOTES);
-
-    if(preg_match('/,/', $to)){
-        $list = explode(',', $to);
+    if(preg_match('/,/u', $mail['email'])){
+        $list = explode(',', $mail['email']);
+        // １つ目はtoにする
         $to = array_shift($list);
+        // 二つ目以降はCCに落とす
         $cc_list = array_merge($list, $orig_cc_list);
+    }else{
+        $to = $mail['email'];
+        $cc_list = $orig_cc_list;
     }
 
-    // 置換を個々に差し込む
-    $body = preg_replace('|{{name}}|u', $name, $template_body);
-    $message->setTo($to);
-    $message->setBody($body);
+    $message->setTo([$to=>$mail['name']]);
     $message->setCc($cc_list);
+
+    // 置換を個々に差し込む
+    $body = preg_replace('|{{name}}|u', $mail['name'], $template_body);
+    $message->setBody($body);
+
+    // 画面表示用に用意(Swiftmailerから取り出す)
+    $swift_address = array_keys($message->getTo())[0]; // php7にしてarray_key_firstにしたい…
+    $swift_name = $message->getTo()[$swift_address];
+    
+    echo "TO: ".htmlspecialchars("{$swift_name}<{$swift_address}>\n", ENT_QUOTES);
+    echo "CC: ";
+    var_dump(array_keys($message->getCc()));
+
+    echo htmlspecialchars("件名:". $message->getSubject()."\n", ENT_QUOTES);
+    echo "本文:<br><pre style='background-color:#eeeeee'>";
+    echo htmlspecialchars($message->getBody()."\n", ENT_QUOTES);
+    echo "</pre>";
 
     // Send the message
     if ($is_no_dry_run) {
         $result = $mailer->send($message);
-        var_dump($message->getTo());
-        var_dump($message->getCc());
-        var_dump($message->getBody());
-        var_dump($result);
+        echo "result:";
+        if($result>0){
+            echo "成功 ({$result}通送信)";
+        }else{
+            echo "失敗？ ({$result}通送信)";
+        }
     } else {
-        var_dump($message->getTo());
-        var_dump($message->getCc());
-        var_dump($message->getBody());
+        echo "result: dry-runなので送信せず";
     }
 
     echo "<hr>";
-
 }
 
-echo "<hr> 終了しました";
+echo "終了しました";
