@@ -49,6 +49,9 @@ echo htmlspecialchars("\nFROM email:\n{$from_email}", ENT_QUOTES);
 $cc_email = $_POST['cc'];
 echo htmlspecialchars("\nCC:\n{$cc_email}", ENT_QUOTES);
 $orig_cc_list = explode(',', $cc_email);
+if(count($orig_cc_list)===1 && $orig_cc_list[0] === ""){ // explode不便すぎる
+    $orig_cc_list = [];
+}
 
 $subject = $_POST['subject'];
 echo htmlspecialchars("\n件名:\n{$subject}", ENT_QUOTES);
