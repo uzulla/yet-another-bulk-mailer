@@ -92,7 +92,11 @@ foreach ($mail_list as $mail) {
         $cc_list = $orig_cc_list;
     }
 
-    $message->setTo([$to=>$mail['name']]);
+    if($mail['name'] !== "-") { // 名前が-なら、名前を設定しない
+        $message->setTo([$to => $mail['name']]);
+    }else{
+        $message->setTo([$to]);
+    }
     $message->setCc($cc_list);
 
     // 置換を個々に差し込む

@@ -37,9 +37,11 @@
     
     ※ \tはタブです。<br>
     ※ メアドはカンマつなぎで複数指定できます、２つ目以降はCCに入ります。<br>
+    ※ 名前に"-"を指定すると、名前指定なしとして扱います。<br>
     ※ サンプル
     <pre style="background-color:#CCCCCC;width:400px;">たなかたろう	taro@example.com
-山田次郎	jiro@example.com,jiro_s_boss@example.com</pre>
+山田次郎	jiro@example.com,jiro_s_boss@example.com
+-	noname@exmaple.com</pre>
         <br>
     ※ 名前は、本文に{{name}}と書く事で置換できます。
     </p>
