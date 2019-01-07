@@ -10,12 +10,15 @@
 
 <form action="do.php" method="post" onsubmit="return confirm('ホントに送信します？（Dry runでもでます）');">
 
-    <p>gmail id</p>
+    <p>smtp id</p>
     <input style="width:100%;" name="gmail_id"/>
 
-    <p>gmail アプリパスワード(GMAILのアカウントのパスワードではない！）</p>
+    <p>smtp pass (or gmailアプリパスワード(GMAILのアカウントのパスワードではない！)）</p>
     ※ https://myaccount.google.com/security から設定すること
     <input style="width:100%;" name="gmail_pass"/>
+
+    <p>smtp server (smtp.mailgun.org, smtp.gmail.com ... )</p>
+    <input style="width:100%;" name="smtp_server" value="smtp.mailgun.org"/>
 
     <p>FROM 表示名</p>
     <input style="width:100%;" name="from_name"/>

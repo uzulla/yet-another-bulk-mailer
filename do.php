@@ -66,8 +66,9 @@ echo "<hr>";
 // swiftmailer 用意
 $gmail_id = $_POST['gmail_id'];
 $gmail_pass = $_POST['gmail_pass'];
+$smtp_server = $_POST['smtp_server'];
 
-$transport = (new Swift_SmtpTransport('smtp.mailgun.org', 465, 'ssl'))
+$transport = (new Swift_SmtpTransport($smtp_server, 465, 'ssl'))
     ->setUsername($gmail_id)
     ->setPassword($gmail_pass);
 
