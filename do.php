@@ -18,16 +18,22 @@ foreach ($mail_list_raw as $email) {
     $email = trim($email);
     if (!preg_match("/@/", $email)) continue;
 
-    $result = preg_match("|\A(.*)\t(.*)\z|u", $email, $m);
-    if (!$result) {
+    $result = explode("\t", $email);
+
+    if (count($result)<2) {
         echo "<span style='color:red'>宛先のフォーマットが不正です。（「本当に」タブでくぎっていますか？）</span>\n";
         var_dump($email);
         exit;
     }
 
     $mail_list[] = [
-        'name' => $m[1],
-        'email' => $m[2]
+        'name' => $result[0],
+        'email' => $result[1],
+        'f1' => $result[2] ?? null,
+        'f2' => $result[3] ?? null,
+        'f3' => $result[4] ?? null,
+        'f4' => $result[5] ?? null,
+        'f5' => $result[6] ?? null
     ];
 }
 
@@ -102,6 +108,23 @@ foreach ($mail_list as $mail) {
 
     // 置換を個々に差し込む
     $body = preg_replace('|{{name}}|u', $mail['name'], $template_body);
+
+    if(isset($mail['f1'])) {
+        $body = preg_replace('|{{f1}}|u', $mail['f1'], $body);
+    }
+    if(isset($mail['f2'])) {
+        $body = preg_replace('|{{f2}}|u', $mail['f2'], $body);
+    }
+    if(isset($mail['f3'])) {
+        $body = preg_replace('|{{f3}}|u', $mail['f3'], $body);
+    }
+    if(isset($mail['f4'])) {
+        $body = preg_replace('|{{f4}}|u', $mail['f4'], $body);
+    }
+    if(isset($mail['f5'])) {
+        $body = preg_replace('|{{f5}}|u', $mail['f5'], $body);
+    }
+
     $message->setBody($body);
 
     // 画面表示用に用意(Swiftmailerから取り出す)

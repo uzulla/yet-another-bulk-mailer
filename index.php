@@ -36,17 +36,18 @@
     <textarea style="width:100%;height:400px;" name="body"></textarea>
 
     <p>宛先<br>
-    例：名前\tメアド{改行}<br>
+    例：名前\tメアド{改行}[[[[[\t追加フィールド]\t追加フィールド]\t追加フィールド]\t追加フィールド]\t追加フィールド]<br>
     
     ※ \tはタブです。<br>
     ※ メアドはカンマつなぎで複数指定できます、２つ目以降はCCに入ります。<br>
     ※ 名前に"-"を指定すると、名前指定なしとして扱います。<br>
     ※ サンプル
-    <pre style="background-color:#CCCCCC;width:400px;">たなかたろう	taro@example.com
-山田次郎	jiro@example.com,jiro_s_boss@example.com
--	noname@exmaple.com</pre>
+    <pre style="background-color:#CCCCCC;">たなかたろう	taro@example.com	追加フィールド1	追加フィールド2	追加フィールド3	追加フィールド4	追加フィールド5
+山田次郎	jiro@example.com,jiro_s_boss@example.com	追加フィールド1	追加フィールド2	追加フィールド3	追加フィールド4	追加フィールド5
+-	noname@exmaple.com	追加フィールド1	追加フィールド2	追加フィールド3	追加フィールド4	追加フィールド5</pre>
         <br>
-    ※ 名前は、本文に{{name}}と書く事で置換できます。
+    ※ 名前は、本文に{{name}}と書く事で置換できます。<br>
+    ※ 本文に５個まで追加フィールドを入れられます。{{f1}}〜{{f5}}が使えます。使わない場合は不要です。<br>
     </p>
     <textarea style="width:100%;height:400px;" name="mail_list"></textarea>
 
