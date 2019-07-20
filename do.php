@@ -59,8 +59,8 @@ if (count($orig_cc_list) === 1 && $orig_cc_list[0] === "") { // explode不便す
     $orig_cc_list = [];
 }
 
-$subject = $_POST['subject'];
-echo htmlspecialchars("\n件名:\n{$subject}", ENT_QUOTES);
+$template_subject = $_POST['subject'];
+echo htmlspecialchars("\n件名:\n{$template_subject}", ENT_QUOTES);
 
 $template_body = $_POST['body'];
 echo "\n本文:<br><pre style='background-color:#eeeeee'>";
@@ -80,7 +80,7 @@ $transport = (new Swift_SmtpTransport($smtp_server, 465, 'ssl'))
 
 $mailer = new Swift_Mailer($transport);
 
-$message = new Swift_Message($subject);
+$message = new Swift_Message();
 $message
     ->setFrom([$from_email => $from_name]);
 
@@ -105,6 +105,28 @@ foreach ($mail_list as $mail) {
         $message->setTo([$to]);
     }
     $message->setCc($cc_list);
+
+    // 件名において、置換を個々に差し込む
+    $subject = preg_replace('|{{name}}|u', $mail['name'], $template_subject);
+
+    if (isset($mail['f1'])) {
+        $subject = preg_replace('|{{f1}}|u', $mail['f1'], $subject);
+    }
+    if (isset($mail['f2'])) {
+        $subject = preg_replace('|{{f2}}|u', $mail['f2'], $subject);
+    }
+    if (isset($mail['f3'])) {
+        $subject = preg_replace('|{{f3}}|u', $mail['f3'], $subject);
+    }
+    if (isset($mail['f4'])) {
+        $subject = preg_replace('|{{f4}}|u', $mail['f4'], $subject);
+    }
+    if (isset($mail['f5'])) {
+        $subject = preg_replace('|{{f5}}|u', $mail['f5'], $subject);
+    }
+
+    $message->setSubject($subject);
+
 
     // 置換を個々に差し込む
     $body = preg_replace('|{{name}}|u', $mail['name'], $template_body);
