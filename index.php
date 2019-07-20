@@ -8,7 +8,24 @@
 
 <h1>秘伝のバルクメーラー</h1>
 
-<form action="do.php" method="post" onsubmit="return confirm('ホントに送信します？（Dry runでもでます）');">
+<script>
+    function checkDryRun(){
+        if(document.getElementById("no_dry_run").checked) {
+            if(confirm('本当に送信しますか？\nDry runでただしいか確認しましたか？')){
+                return true;
+            }else {
+                return false;
+            }
+        }else{
+            if(confirm('これはDry runです、実際には送信されないはずです。\n送信するときには本当に実行するチェックをOnにしてください。')){
+                return true;
+            }else {
+                return false;
+            }
+        }
+    }
+</script>
+<form action="do.php" method="post" onsubmit="return checkDryRun();">
 
     <p>smtp id</p>
     <input style="width:100%;" name="gmail_id"/>
@@ -45,13 +62,13 @@
     <pre style="background-color:#CCCCCC;">たなかたろう	taro@example.com	追加フィールド1	追加フィールド2	追加フィールド3	追加フィールド4	追加フィールド5
 山田次郎	jiro@example.com,jiro_s_boss@example.com	追加フィールド1	追加フィールド2	追加フィールド3	追加フィールド4	追加フィールド5
 -	noname@exmaple.com	追加フィールド1	追加フィールド2	追加フィールド3	追加フィールド4	追加フィールド5</pre>
-        <br>
+    <br>
     ※ 名前は、本文や件名に{{name}}と書く事で置換できます。<br>
     ※ 本文や件名に５個まで追加フィールドを入れられます。{{f1}}〜{{f5}}が使えます。使わない場合は不要です。<br>
     <textarea style="width:100%;height:400px;" name="mail_list"></textarea>
 
     <p> 本当に実行するなら、ここをonに。offならdry run</p>
-    <input type="checkbox" value=1 name="no_dry_run">
+    <input type="checkbox" value="1" name="no_dry_run" id="no_dry_run">
 
     <hr>
     <input type="submit" value="メール送信">
